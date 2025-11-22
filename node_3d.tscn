@@ -1,0 +1,314 @@
+[gd_scene load_steps=15 format=3 uid="uid://duixkv2mvobxf"]
+
+[ext_resource type="PackedScene" uid="uid://cdjsyew83f1k2" path="res://Modelos/Mundo.blend" id="1_noarx"]
+[ext_resource type="PackedScene" uid="uid://cmkx40sgcjqcl" path="res://player.tscn" id="2_noarx"]
+[ext_resource type="PackedScene" uid="uid://bofyemltewqda" path="res://moneda.tscn" id="3_a0tk4"]
+
+[sub_resource type="GDScript" id="GDScript_noarx"]
+resource_name = "Main"
+script/source = "extends Node
+
+# Carga la escena del auto al inicio
+const CAR_SCENE = preload(\"res://Auto.tscn\") # ¡Verifica tu ruta!
+
+# 1. Conecta la señal \"timeout()\" de tu Timer_Carril_1
+#    (Selecciona el Timer, ve a Nodo -> Señales -> timeout() -> Conectar)
+#    ...y conéctala a esta función:
+func _on_timer_carril_1_timeout():
+	# Crea una instancia del auto
+	var new_car = CAR_SCENE.instantiate()
+	
+	# Le da la posición Y la rotación del Marker3D
+	new_car.global_transform = $SpawnLocation_Carril_1.global_transform
+	
+	# Opcional: Dale una velocidad aleatoria
+	new_car.speed = randf_range(8.0, 15.0)
+	
+	# Añade el auto a la escena
+	add_child(new_car)
+
+# 2. Repite el proceso para el Timer_Carril_2
+func _on_timer_carril_2_timeout():
+	var new_car = CAR_SCENE.instantiate()
+	new_car.global_transform = $SpawnLocation_Carril_2.global_transform
+	new_car.speed = randf_range(7.0, 12.0)
+	add_child(new_car)
+
+# ...etc. para todos tus carriles
+
+
+func _on_despawn_zone_left_body_entered(body):
+# Si lo que entró es un auto...
+	if body.is_in_group(\"car\"):
+		# ...¡bórralo!
+		body.queue_free()
+
+
+func _on_despawn_zone_right_body_entered(body):
+	if body.is_in_group(\"car\"):
+			body.queue_free() 
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a0tk4"]
+size = Vector3(13.469482, 30.376099, 135.5342)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_noarx"]
+size = Vector3(130, 10, 170)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r3fl7"]
+size = Vector3(8.515137, 12.096313, 20.44928)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jka67"]
+size = Vector3(12.582886, 8.204834, 143.08588)
+
+[sub_resource type="Sky" id="Sky_noarx"]
+
+[sub_resource type="Environment" id="Environment_a0tk4"]
+background_energy_multiplier = 1.97
+sky = SubResource("Sky_noarx")
+ambient_light_energy = 7.83
+
+[sub_resource type="LabelSettings" id="LabelSettings_noarx"]
+font_size = 30
+
+[sub_resource type="GDScript" id="GDScript_a0tk4"]
+script/source = "extends Label
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(_delta):
+	text = \"Monedas: \" + str(Global.score)
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_i5arm"]
+size = Vector3(19.256104, 4.8084717, 4.729004)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wc5p8"]
+size = Vector3(17.994751, 9.896362, 7.296875)
+
+[node name="Main" type="Node"]
+script = SubResource("GDScript_noarx")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.9395, 15.366955, 37.223267)
+shape = SubResource("BoxShape3D_a0tk4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.429413, 9.0982895, 25.217972)
+shape = SubResource("BoxShape3D_noarx")
+
+[node name="Mundo" parent="Ground" instance=ExtResource("1_noarx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.090236664, -1.4529381, 2.22244)
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -70.295044, 23.456718, 27.22377)
+shape = SubResource("BoxShape3D_a0tk4")
+
+[node name="CollisionShape3D19" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.03121, 19.293247, 34.638474)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D18" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.816406, 18.51324, -14.941105)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D17" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.737095, 18.5345, 78.56881)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D16" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.878899, 18.55576, 25.132236)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D15" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.498573, 19.09635, -31.467583)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D14" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.872337, 15.730618, 88.15315)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D13" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.36359, 19.724743, 48.989296)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D12" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.523205, 16.734451, -30.471613)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D11" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.54404, 16.854042, -36.95362)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D10" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.816643, 17.185852, -33.499687)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59.77185, 18.163015, 57.124245)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D9" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -59.24981, 17.462015, 13.555582)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D8" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.349407, 16.10394, 77.620316)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.31169, 17.492481, 35.463993)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.042534, 16.821947, 4.4314156)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.573749, 17.542507, 2.8388443)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.285877, 35.078228, 31.290886)
+light_energy = 0.779
+light_indirect_energy = 6.193
+light_volumetric_fog_energy = 10.132
+light_angular_distance = 37.11
+light_specular = 5.619
+light_bake_mode = 1
+
+[node name="ZonaFinal" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.066925, 14.166893, 6.4396706)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ZonaFinal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.641243, 4.786682, 11.342682)
+shape = SubResource("BoxShape3D_jka67")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_a0tk4")
+
+[node name="Player" parent="." groups=["player"] instance=ExtResource("2_noarx")]
+transform = Transform3D(0.055385802, 0, -0.998465, 0, 1, 0, 0.998465, 0, 0.055385802, -59.20159, 15.911467, -10.430256)
+
+[node name="CameraPivot" type="Marker3D" parent="Player"]
+transform = Transform3D(0.055385802, 0, 0.998465, 0, 1, 0, -0.998465, 0, 0.055385802, 9.956399, -2.5555897, 8.831501)
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
+transform = Transform3D(0.00851706, 0.49998188, -0.86599404, 0, 0.8660254, 0.50000006, 0.99996376, -0.00425853, 0.007375991, -0.09299469, 10.435669, -6.9247513)
+current = true
+fov = 78.74999
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Up" type="Button" parent="UI"]
+layout_mode = 0
+offset_left = 118.0
+offset_top = 403.0
+offset_right = 193.0
+offset_bottom = 478.0
+
+[node name="Down" type="Button" parent="UI"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 510.0
+offset_right = 195.0
+offset_bottom = 585.0
+
+[node name="Left" type="Button" parent="UI"]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 455.0
+offset_right = 108.0
+offset_bottom = 530.0
+
+[node name="Right" type="Button" parent="UI"]
+layout_mode = 0
+offset_left = 205.0
+offset_top = 451.0
+offset_right = 280.0
+offset_bottom = 526.0
+
+[node name="Label" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 33.0
+offset_right = 280.0
+offset_bottom = 91.0
+text = "Bolas de nieve: 0"
+label_settings = SubResource("LabelSettings_noarx")
+script = SubResource("GDScript_a0tk4")
+
+[node name="Timer_Carril_1" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="SpawnLocation_Carril_1" type="Marker3D" parent="."]
+transform = Transform3D(-0.99989533, 0, 0.014450833, 0, 1, 0, -0.014450833, 0, -0.99989533, -51.78605, 15.61974, -41.601078)
+
+[node name="Timer_Carril_2" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="SpawnLocation_Carril_2" type="Marker3D" parent="."]
+transform = Transform3D(0.99958295, 0, 0.028881142, 0, 1, 0, -0.028881142, 0, 0.99958295, 0, 16.558432, 92.60053)
+
+[node name="DespawnZone_Right" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.84607315, 14.183659, -45.252632)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DespawnZone_Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.022827148, 1.9042358, -1.864502)
+shape = SubResource("BoxShape3D_i5arm")
+
+[node name="DespawnZone_Left" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.792625, 16.116102, 94.33985)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DespawnZone_Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.827942, 4.448181, 6.758072)
+shape = SubResource("BoxShape3D_wc5p8")
+
+[node name="Moneda" type="Node3D" parent="."]
+
+[node name="Moneda6" parent="Moneda" instance=ExtResource("3_a0tk4")]
+transform = Transform3D(-1.1167762, 0, 4.2298074, 0, 4.3747544, 0, -4.2298074, 0, -1.1167762, 14.940001, 16.630484, 52.233383)
+
+[node name="Moneda5" parent="Moneda" instance=ExtResource("3_a0tk4")]
+transform = Transform3D(2.5506687, 0, 3.3115137, 0, 4.179956, 0, -3.3115137, 0, 2.5506687, 15.755966, 16.717731, 1.3032703)
+
+[node name="Moneda4" parent="Moneda" instance=ExtResource("3_a0tk4")]
+transform = Transform3D(2.7250485, 0, 0, 0, 2.7250485, 0, 0, 0, 2.7250485, -14.036943, 18.118843, 72.58783)
+
+[node name="Moneda2" parent="Moneda" instance=ExtResource("3_a0tk4")]
+transform = Transform3D(3.1525397, 0, 0, 0, 3.1525397, 0, 0, 0, 3.1525397, -60.329845, 16.288439, 37.24745)
+
+[node name="Moneda3" parent="Moneda" instance=ExtResource("3_a0tk4")]
+transform = Transform3D(2.506313, 0, 0, 0, 2.506313, 0, 0, 0, 2.506313, -59.133583, 16.90794, 78.2839)
+
+[node name="Moneda" parent="Moneda" instance=ExtResource("3_a0tk4")]
+transform = Transform3D(4.3566113, 0, -0.042430107, 0, 4.3568177, 0, 0.042430107, 0, 4.3566113, -15.222811, 16.266045, 24.155552)
+
+[connection signal="body_entered" from="ZonaFinal" to="Player" method="_on_zona_final_body_entered"]
+[connection signal="button_down" from="UI/Up" to="Player" method="_on_up_button_down"]
+[connection signal="button_up" from="UI/Up" to="Player" method="_on_up_button_up"]
+[connection signal="button_down" from="UI/Down" to="Player" method="_on_down_button_down"]
+[connection signal="button_up" from="UI/Down" to="Player" method="_on_down_button_up"]
+[connection signal="button_down" from="UI/Left" to="Player" method="_on_left_button_down"]
+[connection signal="button_up" from="UI/Left" to="Player" method="_on_left_button_up"]
+[connection signal="button_down" from="UI/Right" to="Player" method="_on_right_button_down"]
+[connection signal="button_up" from="UI/Right" to="Player" method="_on_right_button_up"]
+[connection signal="timeout" from="Timer_Carril_1" to="." method="_on_timer_carril_1_timeout"]
+[connection signal="timeout" from="Timer_Carril_2" to="." method="_on_timer_carril_2_timeout"]
+[connection signal="body_entered" from="DespawnZone_Right" to="." method="_on_despawn_zone_right_body_entered"]
+[connection signal="body_entered" from="DespawnZone_Left" to="." method="_on_despawn_zone_left_body_entered"]

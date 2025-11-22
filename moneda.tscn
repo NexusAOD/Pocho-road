@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3 uid="uid://bofyemltewqda"]
+
+[sub_resource type="GDScript" id="GDScript_5h4tn"]
+script/source = "extends Area3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	rotate_y(2.0 * delta)
+	
+func _on_body_entered(body):
+	if body.is_in_group(\"player\"):
+		# 1. Sumar al puntaje global
+		Global.score += 1
+		
+		# 2. (Opcional) Aquí podrías reproducir un sonido
+		
+		# 3. Destruir la moneda
+		queue_free()
+"
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_5h4tn"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_nghqc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r4iok"]
+albedo_color = Color(0.8, 1, 1, 1)
+
+[node name="Moneda" type="Area3D"]
+transform = Transform3D(0.99995255, 0, -0.009738783, 0, 1, 0, 0.009738783, 0, 0.99995255, 0.052190304, 0.025133342, 0)
+script = SubResource("GDScript_5h4tn")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_5h4tn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_nghqc")
+surface_material_override/0 = SubResource("StandardMaterial3D_r4iok")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

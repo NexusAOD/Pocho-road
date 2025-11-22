@@ -1,0 +1,149 @@
+[gd_scene load_steps=4 format=3 uid="uid://cmkx40sgcjqcl"]
+
+[ext_resource type="PackedScene" uid="uid://u8xl3awspyhu" path="res://Modelos/Pinguino.blend" id="1_4flbx"]
+
+[sub_resource type="GDScript" id="GDScript_4flbx"]
+script/source = "extends CharacterBody3D
+
+# How fast the player moves in meters per second.
+@export var speed = 14
+# The downward acceleration when in the air, in meters per second squared.
+@export var fall_acceleration = 75
+
+var target_velocity = Vector3.ZERO
+
+# --- NUEVO: Variable para la sensibilidad del mouse en VR ---
+var mouse_sensitivity = 0.002
+# ------------------------------------------------------------
+
+func _ready():
+	# 1. Atrapamos el mouse
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# 2. Activamos VR (Native Mobile)
+	var interface = XRServer.find_interface(\"Native mobile\")
+	if interface and interface.initialize():
+		get_viewport().use_xr = true
+		
+		# --- AJUSTES PARA SIMULACIÓN EN MONITOR ---
+		
+		# K1 y K2: Mantienen la curvatura (efecto barril) que pediste
+		interface.k1 = 0.2
+		interface.k2 = 0.2
+		
+		# Display to Lens: ¡Este es el truco!
+		# El valor por defecto suele ser bajo (0.1) y hace que todo se vea lejos.
+		# Al subirlo (por ejemplo a 0.2 o 0.25), haces \"zoom in\" y se siente más cerca.
+		interface.display_to_lens = 0.25  
+		
+		# Distancia entre ojos (IOD):
+		interface.iod = 6.0
+		
+		# NOTA EXTRA: Ajuste de FOV (Campo de Visión)
+		# A veces la cámara VR anula el FOV, pero si sientes que sigues viendo \"demasiado\" a los lados,
+		# puedes intentar acercar la cámara física un poco más al personaje en tu escena.
+
+func _input(event):
+	# --- NUEVO: Lógica para mover la cámara (Pivot) con el Mouse ---
+	if event is InputEventMouseMotion:
+		# Rotamos el Pivot (donde está la cámara VR) horizontalmente
+		$Pivot.rotate_y(-event.relative.x * mouse_sensitivity)
+		
+		# Rotamos verticalmente (con límite para no dar vuelta completa)
+		$Pivot.rotate_x(-event.relative.y * mouse_sensitivity)
+		$Pivot.rotation.x = clamp($Pivot.rotation.x, deg_to_rad(-60), deg_to_rad(60))
+	# ---------------------------------------------------------------
+
+func _physics_process(delta):
+	var direction = Vector3.ZERO
+
+	if Input.is_action_pressed(\"move_back\"): 
+		direction.x += 1
+	if Input.is_action_pressed(\"move_forward\"): 
+		direction.x -= 1
+	if Input.is_action_pressed(\"move_left\"): 
+		direction.z += 1
+	if Input.is_action_pressed(\"move_right\"): 
+		direction.z -= 1
+
+	if direction != Vector3.ZERO:
+		direction = direction.normalized()
+		
+		# --- CAMBIO PARA VR ---
+		# Comenté esta línea porque obligaba al personaje a mirar a donde caminas.
+		# En VR, queremos que mire a donde TÚ mueves el mouse.
+		# $Pivot.basis = Basis.looking_at(direction)
+		
+		# En su lugar, agregamos esto para que camines hacia donde mira la cámara:
+		direction = $Pivot.global_transform.basis * direction
+		# ----------------------
+
+	# Ground Velocity
+	target_velocity.x = direction.x * speed
+	target_velocity.z = direction.z * speed
+
+	# Vertical Velocity
+	if not is_on_floor(): # If in the air, fall towards the floor. Literally gravity
+		target_velocity.y = target_velocity.y - (fall_acceleration * delta)
+
+	# Moving the Character
+	velocity = target_velocity
+	move_and_slide()
+
+# --- Botón Arriba (move_forward) ---
+func _on_up_button_down() -> void:
+	Input.action_press(\"move_forward\")
+
+func _on_up_button_up() -> void:
+	Input.action_release(\"move_forward\")
+
+
+# --- Botón Abajo (move_back) ---
+func _on_down_button_down() -> void:
+	Input.action_press(\"move_back\")
+
+func _on_down_button_up() -> void:
+	Input.action_release(\"move_back\")
+
+
+# --- Botón Izquierda (move_left) ---
+func _on_left_button_down() -> void:
+	Input.action_press(\"move_left\")
+
+func _on_left_button_up() -> void:
+	Input.action_release(\"move_left\")
+
+
+# --- Botón Derecha (move_right) ---
+func _on_right_button_down() -> void:
+	Input.action_press(\"move_right\")
+
+func _on_right_button_up() -> void:
+	Input.action_release(\"move_right\")
+
+
+func _on_zona_final_body_entered(body: Node3D) -> void:
+	if body.is_in_group(\"player\"):
+			# Llama la función \"change_scene_to_file\" en diferido
+			get_tree().call_deferred(\"change_scene_to_file\", \"res://Modelos/GameOver.tscn\")
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4flbx"]
+size = Vector3(3.8270874, 7.0175934, 3.3287659)
+
+[node name="Player" type="CharacterBody3D"]
+script = SubResource("GDScript_4flbx")
+
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="Pinguino" parent="Pivot" instance=ExtResource("1_4flbx")]
+transform = Transform3D(-0.99998206, 0, 0.0059864465, 0, 1, 0, -0.0059864465, 0, -0.99998206, 0, 0, 0)
+
+[node name="XROrigin3D" type="XROrigin3D" parent="Pivot"]
+transform = Transform3D(-0.0768931, 0, 0.9970393, 0, 1, 0, -0.9970393, 0, -0.0768931, -1.3021467, 6.3695393, -0.7391881)
+
+[node name="XRCamera3D" type="XRCamera3D" parent="Pivot/XROrigin3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(-0.007888756, 0, 0.9999689, 0, 1, 0, -0.9999689, 0, -0.007888756, 0.42321134, 3.084899, -0.81197834)
+shape = SubResource("BoxShape3D_4flbx")

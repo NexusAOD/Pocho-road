@@ -1,0 +1,87 @@
+[gd_scene load_steps=4 format=3 uid="uid://chkjf6yt052v2"]
+
+[sub_resource type="GDScript" id="GDScript_lthh4"]
+script/source = "extends Control
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_inicio_pressed() -> void:
+# 1. ¡Importante! Quita la pausa antes de cambiar de escena
+	get_tree().paused = false
+
+	# 2. Recarga tu escena principal
+	# CAMBIA \"res://tu_escena_de_juego.tscn\" por la ruta real a tu escena
+	get_tree().change_scene_to_file(\"res://node_3d.tscn\") # Replace with function body.
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_lthh4"]
+line_spacing = 32.0
+font_size = 86
+font_color = Color(0.06469653, 0.06469653, 0.06469653, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_uubjt"]
+line_spacing = 15.0
+font_size = 28
+font_color = Color(0.06469653, 0.06469653, 0.06469653, 1)
+shadow_color = Color(0, 0, 0, 0.16470589)
+
+[node name="Menu Inicio" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_lthh4")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1153.0
+offset_bottom = 648.0
+color = Color(0.23921569, 1, 0.53333336, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Center"]
+modulate = Color(0.0035191667, 0.0035191681, 0.0035191672, 1)
+layout_mode = 2
+text = "Proyecto Final"
+label_settings = SubResource("LabelSettings_lthh4")
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 35.0
+offset_top = 588.0
+offset_right = 355.0
+offset_bottom = 627.0
+text = "Samuel Espinoza Sucilla"
+label_settings = SubResource("LabelSettings_uubjt")
+
+[node name="Inicio" type="Button" parent="."]
+layout_mode = 0
+offset_left = 485.0
+offset_top = 416.0
+offset_right = 678.0
+offset_bottom = 507.0
+text = "Iniciar"
+
+[connection signal="pressed" from="Inicio" to="." method="_on_inicio_pressed"]
